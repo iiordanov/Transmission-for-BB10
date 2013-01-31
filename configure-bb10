@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+
+if test "$1" = "--simulator"; then
+  shift
+  TARGET_ARCH="x86"
+  TARGET_ARCHEND=${TARGET_ARCH}
+  LIBDIR=${TARGET_ARCH}
+  TARGET_HOST="i486-pc-nto-qnx8.0.0"
+else
+  TARGET_ARCH="armv7"
+  TARGET_ARCHEND="${TARGET_ARCH}le"
+  LIBDIR="armle-v7"
+  TARGET_HOST="arm-unknown-nto-qnx8.0.0eabi"
+fi
+
+RANLIB="${QNX_HOST}/usr/bin/nto${TARGET_ARCH}-ranlib "
+CPP="${QNX_HOST}/usr/bin/qcc -V4.6.3,gcc_nto${TARGET_ARCHEND}_cpp -E "
+CC="${QNX_HOST}/usr/bin/qcc -V4.6.3,gcc_nto${TARGET_ARCHEND}_cpp -Wl,-znow "
+LD="${QNX_HOST}/usr/bin/nto${TARGET_ARCH}-ld " 
+CCLD="${QNX_HOST}/usr/bin/nto${TARGET_ARCH}-ld " 
+export LDFLAGS=" -L${QNX_TARGET}/${LIBDIR}/usr/lib -L${QNX_TARGET}/${LIBDIR}/lib -L${QNX_HOST}/usr/lib/gcc/${TARGET_HOST}/4.6.3 -lgcc -lasound -laudio_manager"
+
+#export CFLAGS=" -g -ggdb -fPIC -I${QNX_TARGET}/usr/include -Wl,-znow -D_QNX_ -DUSE_SOCKET_ROUTE -DHAVE_POSIX_FALLOCATE " 
+#export CXXFLAGS=" -g -ggdb -fPIC -I${QNX_TARGET}/usr/include -Wl,-znow -D_QNX_ -DUSE_SOCKET_ROUTE -DHAVE_POSIX_FALLOCATE " 
+#export MOD_CFLAGS=" -g -ggdb -fPIC -I${QNX_TARGET}/usr/include " 
+
+export CFLAGS=" -O3 -fPIC -I${QNX_TARGET}/usr/include -Wl,-znow -D_QNX_ -DUSE_SOCKET_ROUTE -DHAVE_POSIX_FALLOCATE " 
+export CXXFLAGS=" -O3 -fPIC -I${QNX_TARGET}/usr/include -Wl,-znow -D_QNX_ -DUSE_SOCKET_ROUTE -DHAVE_POSIX_FALLOCATE " 
+export MOD_CFLAGS=" -O3 -fPIC -I${QNX_TARGET}/usr/include " 
+export LIBS=" -lstdc++ "
+
+export LIBCURL_CFLAGS="-L${QNX_TARGET}/${LIBDIR}/usr/lib -I${QNX_TARGET}/usr/include "
+export LIBCURL_LIBS="-lcurl "
+
+export LIBEVENT_CFLAGS="-L/opt/transmission/lib/ -I//opt/transmission/include "
+export LIBEVENT_LIBS="-levent "
+
+./configure --host=${TARGET_HOST} --prefix=/opt/transmission $*
