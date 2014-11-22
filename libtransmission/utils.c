@@ -567,7 +567,8 @@ tr_mkdirp (const char * path_in,
         if (stat (path, &sb))
         {
             /* Folder doesn't exist yet */
-            if (tr_mkdir (path, permissions))
+            /* NASTY HACK: Refuse to create /accounts/1000/removable/sdcard */
+            if (strcmp(path, "/accounts/1000/removable/sdcard") != 0 && tr_mkdir (path, permissions))
             {
                 const int err = errno;
                 tr_err (_(

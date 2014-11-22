@@ -1,7 +1,8 @@
-#!/bin/sh
-#
+#!/bin/bash
 
-if test "$1" = "--simulator"; then
+
+if test "$1" = "--simulator"
+then
   shift
   TARGET_ARCH="x86"
   TARGET_ARCHEND=${TARGET_ARCH}
@@ -13,6 +14,8 @@ else
   LIBDIR="armle-v7"
   TARGET_HOST="arm-unknown-nto-qnx8.0.0eabi"
 fi
+
+source /home/iordan/software/bbndk/bbndk-env_10_2_0_1155.sh
 
 RANLIB="${QNX_HOST}/usr/bin/nto${TARGET_ARCH}-ranlib "
 CPP="${QNX_HOST}/usr/bin/qcc -V4.6.3,gcc_nto${TARGET_ARCHEND}_cpp -E "
@@ -36,4 +39,10 @@ export LIBCURL_LIBS="-lcurl "
 export LIBEVENT_CFLAGS="-L/opt/transmission/lib/ -I//opt/transmission/include "
 export LIBEVENT_LIBS="-levent "
 
-./configure --host=${TARGET_HOST} --prefix=/opt/transmission $*
+./configure --host=${TARGET_HOST} --prefix=/opt/transmission --without-gtk $*
+
+make -j 12
+
+make install
+
+arm-unknown-nto-qnx8.0.0-strip /opt/transmission/bin/transmission*
